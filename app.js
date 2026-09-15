@@ -403,8 +403,8 @@ const commandEndpoint = "https://script.google.com/macros/s/AKfycbwBwc7j-XyUPwXV
 const delay = Math.max(1200, Number(params.get("seconds") || params.get("s") || 13.5) * 1000);
 const start = Math.max(0, Number(params.get("start") || 0)) % comments.length;
 const scale = Math.min(1.8, Math.max(0.55, Number(params.get("scale") || 1)));
-const defaultMediaWidth = Math.min(1200, Math.max(80, Number(params.get("mediaWidth") || params.get("width") || 360)));
-const defaultMediaHeight = Math.min(800, Math.max(60, Number(params.get("mediaHeight") || params.get("height") || 132)));
+const defaultMediaWidth = Math.min(1920, Math.max(80, Number(params.get("mediaWidth") || params.get("width") || window.innerWidth || 360)));
+const defaultMediaHeight = Math.min(1080, Math.max(60, Number(params.get("mediaHeight") || params.get("height") || window.innerHeight || 132)));
 const showMeta = params.get("meta") !== "0";
 const include = (params.get("user") || "all").toLowerCase();
 const overlayMode = (params.get("overlay") || params.get("mode") || "tfc").toLowerCase();

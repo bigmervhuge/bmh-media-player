@@ -149,15 +149,16 @@ body.kelly-overlay .command-card {
 }
 
 .media-card {
-  width: var(--media-width);
-  height: var(--media-height);
+  width: min(var(--media-width), 100vw);
+  height: min(var(--media-height), 100vh);
   min-height: 0;
   visibility: hidden;
   display: grid;
   place-items: center;
   overflow: hidden;
-  justify-self: start;
-  transform: translateX(calc(2px * var(--scale)));
+  justify-self: center;
+  align-self: center;
+  transform: none;
 }
 
 .media-card.is-visible {
