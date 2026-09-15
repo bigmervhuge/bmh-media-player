@@ -537,6 +537,7 @@ commandVideoEl.addEventListener("ended", () => {
 let lastCommandId = "";
 let lastAudioId = "";
 let lastVideoId = "";
+const handledCommandIds = loadHandledCommandIds();
 
 function pollCommandMessage() {
   const callbackName = `topFanCommand_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
@@ -649,11 +650,12 @@ function playCommandAudio(message) {
   commandMetaEl.textContent = "";
   hideCommandVideo();
 
-  if (!message.src || message.id === lastAudioId) {
+  if (!message.src || message.id === lastAudioId || wasCommandHandled(message)) {
     return;
   }
 
   lastAudioId = message.id || "";
+  markCommandHandled(message);
   commandAudioEl.pause();
   commandAudioEl.currentTime = 0;
   commandAudioEl.src = message.src;
@@ -672,11 +674,12 @@ function playCommandVideo(message) {
   commandCardEl.hidden = true;
   commandMetaEl.textContent = "";
 
-  if (!message.src || message.id === lastVideoId) {
+  if (!message.src || message.id === lastVideoId || wasCommandHandled(message)) {
     return;
   }
 
   lastVideoId = message.id || "";
+  markCommandHandled(message);
   applyCommandVideoSize(message);
   mediaCardEl.classList.remove("is-visible");
   mediaCardEl.setAttribute("aria-hidden", "true");
@@ -717,6 +720,37 @@ function playCommandVideo(message) {
 function parsePositiveNumber(value) {
   const number = Number(value);
   return Number.isFinite(number) && number > 0 ? number : null;
+}
+
+function loadHandledCommandIds() {
+  try {
+    const raw = window.localStorage.getItem("bmhHandledCommandIds");
+    const ids = JSON.parse(raw || "[]");
+    return new Set(Array.isArray(ids) ? ids.slice(-60) : []);
+  } catch (error) {
+    return new Set();
+  }
+}
+
+function saveHandledCommandIds() {
+  try {
+    window.localStorage.setItem("bmhHandledCommandIds", JSON.stringify([...handledCommandIds].slice(-60)));
+  } catch (error) {
+    // Ignore storage failures; the in-memory checks still work for this page load.
+  }
+}
+
+function wasCommandHandled(message) {
+  return Boolean(message && message.id && handledCommandIds.has(message.id));
+}
+
+function markCommandHandled(message) {
+  if (!message || !message.id) {
+    return;
+  }
+
+  handledCommandIds.add(message.id);
+  saveHandledCommandIds();
 }
 
 function applyCommandVideoSize(message) {
